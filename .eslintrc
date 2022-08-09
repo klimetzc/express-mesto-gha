@@ -1,17 +1,5 @@
 {
-  "env": {
-    "browser": true,
-    "commonjs": true,
-    "es2021": true
-  },
-  "extends": ["airbnb-base", "prettier", "plugin:node/recommended"],
-  "parserOptions": {
-    "ecmaFeatures": {
-      "jsx": true
-    },
-    "ecmaVersion": "latest"
-  },
-  "plugins": ["prettier"],
+  "extends": ["airbnb-base"],
   "rules": {
     "no-underscore-dangle": ["error", { "allow": ["_id"] }]
   }

@@ -32,7 +32,7 @@ module.exports.likeCard = (req, res) => {
     {
       $addToSet: { likes: req.user._id },
     },
-    { new: true }
+    { new: true },
   )
     .then((data) => {
       if (data) res.send({ data });
@@ -47,7 +47,7 @@ module.exports.deleteLike = (req, res) => {
   Card.findByIdAndUpdate(
     req.params.cardId,
     { $pull: { likes: req.user._id } },
-    { new: true }
+    { new: true },
   )
     .then((data) => {
       if (data) res.send({ data });

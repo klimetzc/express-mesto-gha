@@ -1,20 +1,22 @@
+const constants = require('./constants');
+
 module.exports.handleError = (error, response) => {
   let [statusCode, message] = ['', ''];
   switch (error.name) {
     case 'CastError':
-      statusCode = 400;
+      statusCode = constants.status400;
       message = 'Неверный запрос.';
       break;
     case 'ValidationError':
-      statusCode = 400;
+      statusCode = constants.status400;
       message = 'Неверный запрос.';
       break;
     case 'NotFoundError':
-      statusCode = 404;
+      statusCode = constants.status404;
       message = error.message;
       break;
     default:
-      statusCode = 500;
+      statusCode = constants.status500;
       message = 'Ошибка на стороне сервера. Попробуйте позже';
       break;
   }
