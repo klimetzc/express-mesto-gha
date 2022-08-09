@@ -1,5 +1,5 @@
 const User = require('../models/user');
-const { handleError } = require('../utils/utils');
+const { handleError, NotFoundError } = require('../utils/utils');
 
 module.exports.getUsers = (req, res) => {
   User.find({})
@@ -14,7 +14,8 @@ module.exports.getUsers = (req, res) => {
 module.exports.getUserById = (req, res) => {
   User.findById(req.params.userId)
     .then((data) => {
-      res.send({ data });
+      if (data) res.send({ data });
+      else throw new NotFoundError('Такого пользователя не существует');
     })
     .catch((e) => {
       handleError(e, res);
@@ -34,7 +35,12 @@ module.exports.createUser = (req, res) => {
 
 module.exports.updateUserInfo = (req, res) => {
   const { name, about } = req.body;
-  User.findByIdAndUpdate(req.user._id, { name, about }, { new: true })
+
+  User.findByIdAndUpdate(
+    req.user._id,
+    { $set: { name, about } },
+    { new: true, runValidators: true }
+  )
     .then((user) => {
       res.send({ user });
     })

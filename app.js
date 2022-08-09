@@ -26,6 +26,10 @@ app.use((req, res, next) => {
 app.use('/cards', require('./routes/cards'));
 app.use('/users', require('./routes/users'));
 
+app.use((req, res) => {
+  res.status(404).send({ message: 'Такой страницы не существует' });
+});
+
 app.listen(PORT, () => {
   console.log(`Сервер запущен на порту: ${PORT}`);
 });

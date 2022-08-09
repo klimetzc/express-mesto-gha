@@ -1,5 +1,5 @@
 const Card = require('../models/card');
-const { handleError } = require('../utils/utils');
+const { handleError, NotFoundError } = require('../utils/utils');
 
 module.exports.getCards = (req, res) => {
   Card.find({})
@@ -35,7 +35,8 @@ module.exports.likeCard = (req, res) => {
     { new: true }
   )
     .then((data) => {
-      res.send({ data });
+      if (data) res.send({ data });
+      else throw new NotFoundError('Такого пользователя не существует');
     })
     .catch((e) => {
       handleError(e, res);
@@ -49,7 +50,8 @@ module.exports.deleteLike = (req, res) => {
     { new: true }
   )
     .then((data) => {
-      res.send({ data });
+      if (data) res.send({ data });
+      else throw new NotFoundError('Такого пользователя не существует');
     })
     .catch((e) => {
       handleError(e, res);
@@ -59,7 +61,8 @@ module.exports.deleteLike = (req, res) => {
 module.exports.deleteCard = (req, res) => {
   Card.findByIdAndDelete(req.params.cardId)
     .then((data) => {
-      res.send({ data });
+      if (data) res.send({ data });
+      else throw new NotFoundError('Такого пользователя не существует');
     })
     .catch((e) => {
       handleError(e, res);
