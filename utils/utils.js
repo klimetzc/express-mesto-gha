@@ -18,7 +18,7 @@ module.exports.handleError = (error, response) => {
       message = 'Ошибка на стороне сервера. Попробуйте позже';
       break;
   }
-  response.status(statusCode).send({ message: [error.name, error.message] });
+  response.status(statusCode).send({ message });
 };
 
 class NotFoundError {
