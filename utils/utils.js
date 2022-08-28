@@ -15,6 +15,10 @@ module.exports.handleError = (error, response) => {
       statusCode = constants.status404;
       message = error.message;
       break;
+    case 'ForbiddenError':
+      statusCode = constants.status404;
+      message = error.message;
+      break;
     default:
       statusCode = constants.status500;
       message = 'Ошибка на стороне сервера. Попробуйте позже';
@@ -22,11 +26,3 @@ module.exports.handleError = (error, response) => {
   }
   response.status(statusCode).send({ message });
 };
-
-class NotFoundError {
-  constructor(message) {
-    this.message = message;
-    this.name = 'NotFoundError';
-  }
-}
-module.exports.NotFoundError = NotFoundError;

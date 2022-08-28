@@ -1,5 +1,7 @@
 const Card = require('../models/card');
-const { handleError, NotFoundError } = require('../utils/utils');
+const { handleError } = require('../utils/utils');
+const { NotFoundError } = require('../utils/Errors/NotFoundError');
+const { ForbiddenError } = require('../utils/Errors/ForbiddenError');
 
 module.exports.getCards = (req, res) => {
   Card.find({})
@@ -44,17 +46,22 @@ module.exports.likeCard = (req, res) => {
 };
 
 module.exports.deleteLike = (req, res) => {
-  Card.findByIdAndUpdate(
-    req.params.cardId,
-    { $pull: { likes: req.user._id } },
-    { new: true },
-  )
-    .then((data) => {
-      if (data) res.send({ data });
-      else throw new NotFoundError('Такого пользователя не существует');
-    })
-    .catch((e) => {
-      handleError(e, res);
+  Card.findById(req.params.cardId).then((card) => {
+    if (card._id !== req.user._id) throw new ForbiddenError('Можео удалять только свои карточки');
+  })
+    .then(() => {
+      Card.findByIdAndUpdate(
+        req.params.cardId,
+        { $pull: { likes: req.user._id } },
+        { new: true },
+      )
+        .then((data) => {
+          if (data) res.send({ data });
+          else throw new NotFoundError('Такого пользователя не существует');
+        })
+        .catch((e) => {
+          handleError(e, res);
+        });
     });
 };
 
