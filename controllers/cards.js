@@ -14,7 +14,10 @@ module.exports.getCards = (req, res) => {
 };
 
 module.exports.createCard = (req, res) => {
+  console.log('req ', req.body);
   const { name, link } = req.body;
+
+  console.log('NAME LINK: ', name, link);
   Card.create({
     name,
     link,
@@ -46,17 +49,28 @@ module.exports.likeCard = (req, res) => {
 };
 
 module.exports.deleteLike = (req, res) => {
+  Card.findByIdAndUpdate(
+    req.params.cardId,
+    { $pull: { likes: req.user._id } },
+    { new: true },
+  )
+    .then((data) => {
+      if (data) res.send({ data });
+      else throw new NotFoundError('Такой карточки не существует');
+    })
+    .catch((e) => {
+      handleError(e, res);
+    });
+};
+
+module.exports.deleteCard = (req, res) => {
   Card.findById(req.params.cardId)
     .then((card) => {
       if (!card) throw new NotFoundError('Карточка не найдена');
       if (card._id !== req.user._id) throw new ForbiddenError('Можно удалять только свои карточки');
     })
     .then(() => {
-      Card.findByIdAndUpdate(
-        req.params.cardId,
-        { $pull: { likes: req.user._id } },
-        { new: true },
-      )
+      Card.findByIdAndDelete(req.params.cardId)
         .then((data) => {
           if (data) res.send({ data });
           else throw new NotFoundError('Такого пользователя не существует');
@@ -64,17 +78,5 @@ module.exports.deleteLike = (req, res) => {
         .catch((e) => {
           handleError(e, res);
         });
-    })
-    .catch((e) => handleError(e, res));
-};
-
-module.exports.deleteCard = (req, res) => {
-  Card.findByIdAndDelete(req.params.cardId)
-    .then((data) => {
-      if (data) res.send({ data });
-      else throw new NotFoundError('Такого пользователя не существует');
-    })
-    .catch((e) => {
-      handleError(e, res);
     });
 };

@@ -1,5 +1,6 @@
 const router = require('express').Router();
 const { celebrate, Joi } = require('celebrate');
+const validator = require('validator');
 const {
   getUsers,
   getUserById,
@@ -14,7 +15,7 @@ router.get('/me', getCurrentUser);
 
 router.get('/:userId', celebrate({
   params: Joi.object().keys({
-    userId: Joi.string().min(2).max(30),
+    userId: Joi.string().length(24).hex(),
   }),
 }), getUserById); // получить 1 пользователя
 
@@ -27,7 +28,9 @@ router.patch('/me', celebrate({
 
 router.patch('/me/avatar', celebrate({
   body: Joi.object().keys({
-    avatar: Joi.string().uri().required().min(2),
+    avatar: Joi.string().custom((value) => {
+      if (!validator.isURL(value)) throw new Error('Неверный адрес');
+    }),
   }),
 }), updateUserAvatar); // обновить аватар
 

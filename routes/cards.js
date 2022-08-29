@@ -1,5 +1,6 @@
 const router = require('express').Router();
 const { celebrate, Joi } = require('celebrate');
+const validator = require('validator');
 const {
   getCards,
   deleteLike,
@@ -13,7 +14,9 @@ router.get('/', getCards); // получить все карты
 router.post('/', celebrate({
   body: Joi.object().keys({
     name: Joi.string().required().min(2).max(30),
-    link: Joi.string().required().uri(),
+    link: Joi.string().required().custom((value) => {
+      if (!validator.isURL(value)) throw new Error('Неверный адрес');
+    }),
   }),
 }), createCard); // создать карту
 

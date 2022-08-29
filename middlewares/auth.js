@@ -3,7 +3,7 @@ const { jwtSecretKey } = require('../utils/constants');
 
 module.exports = (req, res, next) => {
   const { jwt } = req.cookies;
-  console.log(req.cookies.jwt);
+  // console.log(req.cookies.jwt);
 
   if (!jwt) {
     return res.status(401).send({ message: 'Необходима авторизация' });
