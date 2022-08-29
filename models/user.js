@@ -24,6 +24,7 @@ const userSchema = new mongoose.Schema({
   email: {
     required: true,
     type: String,
+    unique: true,
     validate: {
       validator: (value) => validator.isEmail(value),
     },
@@ -40,7 +41,7 @@ const userSchema = new mongoose.Schema({
  * @memberOf User
  */
 userSchema.statics.findUserByCredentials = function (email, password) {
-  return this.findOne({ email })
+  return this.findOne({ email }).select('+password')
     .then((user) => {
       if (!user) return Promise.reject(new Error('Неправильные почта или пароль'));
       return bcrypt.compare(password, user.password)

@@ -3,6 +3,14 @@ const constants = require('./constants');
 module.exports.handleError = (error, response) => {
   let [statusCode, message] = ['', ''];
   switch (error.name) {
+    case 'BadRequest':
+      statusCode = constants.status400;
+      message = 'Ошибка в запросе';
+      break;
+    case 'ConflictError':
+      statusCode = constants.status409;
+      message = error.message;
+      break;
     case 'CastError':
       statusCode = constants.status400;
       message = 'Неверный запрос.';

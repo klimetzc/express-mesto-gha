@@ -4,6 +4,7 @@ const User = require('../models/user');
 const { handleError } = require('../utils/utils');
 const { jwtSecretKey } = require('../utils/constants');
 const { NotFoundError } = require('../utils/Errors/NotFoundError');
+const { ConflictError } = require('../utils/Errors/ConflictError');
 
 module.exports.getUsers = (req, res) => {
   User.find({})
@@ -39,16 +40,34 @@ module.exports.getUserById = (req, res) => {
     });
 };
 
-module.exports.createUser = (req, res) => {
+module.exports.createUser = async (req, res) => {
   const {
     name, about, avatar, email, password,
   } = req.body;
+
+  const user = await User.findOne({ email }).exec();
+  try {
+    if (user) throw new ConflictError('Такой пользователь уже зарегистрирован');
+  } catch (e) {
+    handleError(e, res);
+  }
+
   bcrypt.hash(password, 10)
     .then((hash) => User.create({
       name, about, avatar, email, password: hash,
     })
       .then((data) => {
-        res.send({ data });
+        const userInfo = { ...data };
+        delete userInfo.password;
+        res.send({
+          data: {
+            name: data.name,
+            about: data.about,
+            avatar: data.avatar,
+            email: data.email,
+            _id: data._id,
+          },
+        });
       })
       .catch((e) => {
         handleError(e, res);
@@ -84,16 +103,17 @@ module.exports.updateUserAvatar = (req, res) => {
 
 module.exports.login = (req, res) => {
   const { email, password } = req.body;
-  User.findOne({ email }).select('+password')
-    .then((user) => {
-      if (!user) return Promise.reject(new Error('Неправльные почта или пароль'));
-      return bcrypt.compare(password, user.password);
-    })
-    .then((matched) => {
-      if (!matched) return Promise.reject(new Error('Неправильные почта или пароль'));
-      res.send({ message: 'Авторизация прошла успешно' });
-    })
-    .catch((err) => res.status(401).send({ message: err.message }));
+
+  // User.findOne({ email }).select('+password')
+  //   .then((user) => {
+  //     if (!user) return Promise.reject(new Error('Неправльные почта или пароль'));
+  //     return bcrypt.compare(password, user.password);
+  //   })
+  //   .then((matched) => {
+  //     if (!matched) return Promise.reject(new Error('Неправильные почта или пароль'));
+  //     // res.send({ message: 'Авторизация прошла успешно' });
+  //   })
+  //   .catch((err) => res.status(401).send({ message: err.message }));
 
   User.findUserByCredentials(email, password)
     .then((user) => {

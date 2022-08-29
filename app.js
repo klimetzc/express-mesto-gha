@@ -2,7 +2,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
-const { celebrate, Joi } = require('celebrate');
+const { celebrate, Joi, errors } = require('celebrate');
 const constants = require('./utils/constants');
 const auth = require('./middlewares/auth');
 const { login, createUser } = require('./controllers/users');
@@ -10,9 +10,9 @@ const { login, createUser } = require('./controllers/users');
 const app = express();
 const { PORT = 3000 } = process.env;
 
+app.use(cookieParser());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-app.use(cookieParser());
 
 const options = {}; // TODO
 
@@ -41,6 +41,8 @@ app.post('/signup', celebrate({
 
 app.use('/cards', auth, require('./routes/cards'));
 app.use('/users', auth, require('./routes/users'));
+
+app.use(errors());
 
 app.use((req, res) => {
   res
