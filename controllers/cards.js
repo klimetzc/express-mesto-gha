@@ -46,9 +46,11 @@ module.exports.likeCard = (req, res) => {
 };
 
 module.exports.deleteLike = (req, res) => {
-  Card.findById(req.params.cardId).then((card) => {
-    if (card._id !== req.user._id) throw new ForbiddenError('Можео удалять только свои карточки');
-  })
+  Card.findById(req.params.cardId)
+    .then((card) => {
+      if (!card) throw new NotFoundError('Карточка не найдена');
+      if (card._id !== req.user._id) throw new ForbiddenError('Можно удалять только свои карточки');
+    })
     .then(() => {
       Card.findByIdAndUpdate(
         req.params.cardId,
@@ -62,7 +64,8 @@ module.exports.deleteLike = (req, res) => {
         .catch((e) => {
           handleError(e, res);
         });
-    });
+    })
+    .catch((e) => handleError(e, res));
 };
 
 module.exports.deleteCard = (req, res) => {
