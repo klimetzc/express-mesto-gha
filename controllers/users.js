@@ -12,7 +12,8 @@ module.exports.getUsers = (req, res) => {
       res.send({ data: users });
     })
     .catch((e) => {
-      handleError(e, res);
+      const { statusCode, message } = handleError(e);
+      res.status(statusCode).send({ message });
     });
 };
 
@@ -25,7 +26,8 @@ module.exports.getCurrentUser = (req, res) => {
       res.send({ data });
     })
     .catch((e) => {
-      handleError(e, res);
+      const { statusCode, message } = handleError(e);
+      res.status(statusCode).send({ message });
     });
 };
 
@@ -36,7 +38,8 @@ module.exports.getUserById = (req, res) => {
       else throw new NotFoundError('Такого пользователя не существует');
     })
     .catch((e) => {
-      handleError(e, res);
+      const { statusCode, message } = handleError(e);
+      res.status(statusCode).send({ message });
     });
 };
 
@@ -49,7 +52,8 @@ module.exports.createUser = async (req, res) => {
   try {
     if (user) throw new ConflictError('Такой пользователь уже зарегистрирован');
   } catch (e) {
-    handleError(e, res);
+    const { statusCode, message } = handleError(e);
+    res.status(statusCode).send({ message });
   }
 
   bcrypt.hash(password, 10)
@@ -70,7 +74,8 @@ module.exports.createUser = async (req, res) => {
         });
       })
       .catch((e) => {
-        handleError(e, res);
+        const { statusCode, message } = handleError(e);
+        res.status(statusCode).send({ message });
       }));
 };
 
@@ -86,7 +91,8 @@ module.exports.updateUserInfo = (req, res) => {
       res.send({ user });
     })
     .catch((e) => {
-      handleError(e, res);
+      const { statusCode, message } = handleError(e);
+      res.status(statusCode).send({ message });
     });
 };
 
@@ -97,7 +103,8 @@ module.exports.updateUserAvatar = (req, res) => {
       res.send({ data });
     })
     .catch((e) => {
-      handleError(e, res);
+      const { statusCode, message } = handleError(e);
+      res.status(statusCode).send({ message });
     });
 };
 
@@ -114,7 +121,8 @@ module.exports.login = (req, res) => {
         })
         .send({ token });
     })
-    .catch((err) => {
-      res.status(401).send({ message: err.message });
+    .catch((e) => {
+      const { statusCode, message } = handleError(e);
+      res.status(statusCode).send({ message });
     });
 };

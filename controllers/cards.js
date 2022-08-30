@@ -9,7 +9,8 @@ module.exports.getCards = (req, res) => {
       res.send({ data });
     })
     .catch((e) => {
-      handleError(e, res);
+      const { statusCode, message } = handleError(e);
+      res.status(statusCode).send({ message });
     });
 };
 
@@ -27,7 +28,8 @@ module.exports.createCard = (req, res) => {
       res.send({ data });
     })
     .catch((e) => {
-      handleError(e, res);
+      const { statusCode, message } = handleError(e);
+      res.status(statusCode).send({ message });
     });
 };
 
@@ -44,7 +46,8 @@ module.exports.likeCard = (req, res) => {
       else throw new NotFoundError('Такого пользователя не существует');
     })
     .catch((e) => {
-      handleError(e, res);
+      const { statusCode, message } = handleError(e);
+      res.status(statusCode).send({ message });
     });
 };
 
@@ -59,15 +62,17 @@ module.exports.deleteLike = (req, res) => {
       else throw new NotFoundError('Такой карточки не существует');
     })
     .catch((e) => {
-      handleError(e, res);
+      const { statusCode, message } = handleError(e);
+      res.status(statusCode).send({ message });
     });
 };
 
 module.exports.deleteCard = (req, res) => {
   Card.findById(req.params.cardId)
     .then((card) => {
-      if (!card) throw new NotFoundError('Карточка не найдена');
-      if (card._id !== req.user._id) throw new ForbiddenError('Можно удалять только свои карточки');
+      console.log('card: ', card);
+      if (!card) return Promise.reject(new NotFoundError('Карточка не найдена'));
+      if (card._id !== req.user._id) return Promise.reject(new ForbiddenError('Можно удалять только свои карточки'));
     })
     .then(() => {
       Card.findByIdAndDelete(req.params.cardId)
@@ -76,7 +81,12 @@ module.exports.deleteCard = (req, res) => {
           else throw new NotFoundError('Такого пользователя не существует');
         })
         .catch((e) => {
-          handleError(e, res);
+          const { statusCode, message } = handleError(e);
+          res.status(statusCode).send({ message });
         });
+    })
+    .catch((e) => {
+      const { statusCode, message } = handleError(e);
+      res.status(statusCode).send({ message });
     });
 };

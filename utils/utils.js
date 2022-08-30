@@ -1,6 +1,6 @@
 const constants = require('./constants');
 
-module.exports.handleError = (error, response) => {
+module.exports.handleError = (error) => {
   let [statusCode, message] = ['', ''];
   switch (error.name) {
     case 'BadRequest':
@@ -32,5 +32,6 @@ module.exports.handleError = (error, response) => {
       message = 'Ошибка на стороне сервера. Попробуйте позже';
       break;
   }
-  response.status(statusCode).send({ message });
+  // response.status(statusCode).send({ message });
+  return { statusCode, message };
 };
