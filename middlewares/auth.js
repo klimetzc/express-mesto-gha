@@ -19,6 +19,6 @@ module.exports = (req, res, next) => {
   }
 
   req.user = payload;
-
+  console.log('req.body in auth: ', req.body);
   next();
 };

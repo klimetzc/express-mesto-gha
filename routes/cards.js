@@ -16,6 +16,7 @@ router.post('/', celebrate({
     name: Joi.string().required().min(2).max(30),
     link: Joi.string().required().custom((value) => {
       if (!validator.isURL(value)) throw new Error('Неверный адрес');
+      return value;
     }),
   }),
 }), createCard); // создать карту

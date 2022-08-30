@@ -22,6 +22,11 @@ mongoose.connect('mongodb://localhost:27017/mestodb', options, (err) => {
   else console.log('database connection');
 });
 
+app.use((req, res, next) => {
+  console.log('body: ', req.body);
+  next();
+});
+
 app.post('/signin', celebrate({
   body: Joi.object().keys({
     email: Joi.string().required().email(),
