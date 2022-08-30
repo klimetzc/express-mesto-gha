@@ -3,13 +3,11 @@ const { jwtSecretKey } = require('../utils/constants');
 
 module.exports = (req, res, next) => {
   const { jwt } = req.cookies;
-  // console.log(req.cookies.jwt);
 
   if (!jwt) {
     return res.status(401).send({ message: 'Необходима авторизация' });
   }
 
-  // const token = jwt.replace('Bearer ', '');
   let payload;
 
   try {
@@ -19,6 +17,6 @@ module.exports = (req, res, next) => {
   }
 
   req.user = payload;
-  console.log('req.body in auth: ', req.body);
+
   next();
 };

@@ -15,10 +15,8 @@ module.exports.getCards = (req, res) => {
 };
 
 module.exports.createCard = (req, res) => {
-  console.log('req ', req.body);
   const { name, link } = req.body;
 
-  console.log('NAME LINK: ', name, link);
   Card.create({
     name,
     link,

@@ -11,7 +11,7 @@ const {
 
 router.get('/', getUsers); // получить всех пользователей
 
-router.get('/me', getCurrentUser);
+router.get('/me', getCurrentUser); // получить текущего пользователся
 
 router.get('/:userId', celebrate({
   params: Joi.object().keys({
@@ -24,7 +24,7 @@ router.patch('/me', celebrate({
     name: Joi.string().required().min(2).max(30),
     about: Joi.string().required().min(2).max(30),
   }),
-}), updateUserInfo); // обновить имя&инфу юзера
+}), updateUserInfo); // обновить имя & инфу юзера
 
 router.patch('/me/avatar', celebrate({
   body: Joi.object().keys({

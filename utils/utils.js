@@ -36,6 +36,6 @@ module.exports.handleError = (error) => {
       message = 'Ошибка на стороне сервера. Попробуйте позже';
       break;
   }
-  // response.status(statusCode).send({ message });
+
   return { statusCode, message };
 };
