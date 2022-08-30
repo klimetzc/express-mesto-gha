@@ -70,9 +70,8 @@ module.exports.deleteLike = (req, res) => {
 module.exports.deleteCard = (req, res) => {
   Card.findById(req.params.cardId)
     .then((card) => {
-      console.log('card: ', card);
       if (!card) return Promise.reject(new NotFoundError('Карточка не найдена'));
-      if (card._id !== req.user._id) return Promise.reject(new ForbiddenError('Можно удалять только свои карточки'));
+      if (card.owner._id.toString() !== req.user._id) return Promise.reject(new ForbiddenError('Можно удалять только свои карточки'));
     })
     .then(() => {
       Card.findByIdAndDelete(req.params.cardId)

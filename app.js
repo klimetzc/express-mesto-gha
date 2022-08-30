@@ -39,6 +39,7 @@ app.post('/signup', celebrate({
     about: Joi.string().min(2).max(30),
     avatar: Joi.string().custom((value) => {
       if (!validator.isURL(value)) throw new Error('Неверный адрес');
+      return value;
     }),
     email: Joi.string().required().email(),
     password: Joi.string().required(),

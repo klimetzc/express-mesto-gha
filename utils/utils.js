@@ -7,6 +7,10 @@ module.exports.handleError = (error) => {
       statusCode = constants.status400;
       message = 'Ошибка в запросе';
       break;
+    case 'UnauthorizedError':
+      statusCode = constants.status401;
+      message = error.message;
+      break;
     case 'ConflictError':
       statusCode = constants.status409;
       message = error.message;
@@ -24,7 +28,7 @@ module.exports.handleError = (error) => {
       message = error.message;
       break;
     case 'ForbiddenError':
-      statusCode = constants.status404;
+      statusCode = constants.status403;
       message = error.message;
       break;
     default:

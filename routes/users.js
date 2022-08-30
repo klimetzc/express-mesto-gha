@@ -30,6 +30,7 @@ router.patch('/me/avatar', celebrate({
   body: Joi.object().keys({
     avatar: Joi.string().custom((value) => {
       if (!validator.isURL(value)) throw new Error('Неверный адрес');
+      return value;
     }),
   }),
 }), updateUserAvatar); // обновить аватар

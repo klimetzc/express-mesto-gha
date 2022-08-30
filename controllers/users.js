@@ -18,7 +18,6 @@ module.exports.getUsers = (req, res) => {
 };
 
 module.exports.getCurrentUser = (req, res) => {
-  console.log('function');
   User.findById(req.user._id)
     .then((data) => {
       if (!data) throw new NotFoundError('Пользователь не найден');
@@ -61,15 +60,12 @@ module.exports.createUser = async (req, res) => {
       name, about, avatar, email, password: hash,
     })
       .then((data) => {
-        const userInfo = { ...data };
-        delete userInfo.password;
         res.send({
-          data: {
+          user: {
+            email: data.email,
             name: data.name,
             about: data.about,
             avatar: data.avatar,
-            email: data.email,
-            _id: data._id,
           },
         });
       })
@@ -98,9 +94,9 @@ module.exports.updateUserInfo = (req, res) => {
 
 module.exports.updateUserAvatar = (req, res) => {
   const { avatar } = req.body;
-  User.findByIdAndUpdate(req.user._id, { avatar }, { new: true })
-    .then((data) => {
-      res.send({ data });
+  User.findByIdAndUpdate(req.user._id, { avatar }, { new: true, runValidators: true })
+    .then((user) => {
+      res.send({ data: user });
     })
     .catch((e) => {
       const { statusCode, message } = handleError(e);
