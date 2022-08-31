@@ -1,20 +1,16 @@
 const Card = require('../models/card');
-const { handleError } = require('../utils/utils');
 const { NotFoundError } = require('../utils/Errors/NotFoundError');
 const { ForbiddenError } = require('../utils/Errors/ForbiddenError');
 
-module.exports.getCards = (req, res) => {
+module.exports.getCards = (req, res, next) => {
   Card.find({})
     .then((data) => {
       res.send({ data });
     })
-    .catch((e) => {
-      const { statusCode, message } = handleError(e);
-      res.status(statusCode).send({ message });
-    });
+    .catch(next);
 };
 
-module.exports.createCard = (req, res) => {
+module.exports.createCard = (req, res, next) => {
   const { name, link } = req.body;
 
   Card.create({
@@ -25,13 +21,10 @@ module.exports.createCard = (req, res) => {
     .then((data) => {
       res.send({ data });
     })
-    .catch((e) => {
-      const { statusCode, message } = handleError(e);
-      res.status(statusCode).send({ message });
-    });
+    .catch(next);
 };
 
-module.exports.likeCard = (req, res) => {
+module.exports.likeCard = (req, res, next) => {
   Card.findByIdAndUpdate(
     req.params.cardId,
     {
@@ -43,13 +36,10 @@ module.exports.likeCard = (req, res) => {
       if (data) res.send({ data });
       else throw new NotFoundError('Такого пользователя не существует');
     })
-    .catch((e) => {
-      const { statusCode, message } = handleError(e);
-      res.status(statusCode).send({ message });
-    });
+    .catch(next);
 };
 
-module.exports.deleteLike = (req, res) => {
+module.exports.deleteLike = (req, res, next) => {
   Card.findByIdAndUpdate(
     req.params.cardId,
     { $pull: { likes: req.user._id } },
@@ -59,13 +49,10 @@ module.exports.deleteLike = (req, res) => {
       if (data) res.send({ data });
       else throw new NotFoundError('Такой карточки не существует');
     })
-    .catch((e) => {
-      const { statusCode, message } = handleError(e);
-      res.status(statusCode).send({ message });
-    });
+    .catch(next);
 };
 
-module.exports.deleteCard = (req, res) => {
+module.exports.deleteCard = (req, res, next) => {
   Card.findById(req.params.cardId)
     .then((card) => {
       if (!card) return Promise.reject(new NotFoundError('Карточка не найдена'));
@@ -77,13 +64,7 @@ module.exports.deleteCard = (req, res) => {
           if (data) res.send({ data });
           else throw new NotFoundError('Такого пользователя не существует');
         })
-        .catch((e) => {
-          const { statusCode, message } = handleError(e);
-          res.status(statusCode).send({ message });
-        });
+        .catch(next);
     })
-    .catch((e) => {
-      const { statusCode, message } = handleError(e);
-      res.status(statusCode).send({ message });
-    });
+    .catch(next);
 };

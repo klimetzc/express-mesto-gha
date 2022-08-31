@@ -7,6 +7,7 @@ const validator = require('validator');
 const constants = require('./utils/constants');
 const auth = require('./middlewares/auth');
 const { login, createUser } = require('./controllers/users');
+const { errorHandling } = require('./middlewares/errorHandling');
 
 const app = express();
 const { PORT = 3000 } = process.env;
@@ -45,13 +46,15 @@ app.post('/signup', celebrate({
 app.use('/cards', auth, require('./routes/cards'));
 app.use('/users', auth, require('./routes/users'));
 
-app.use(errors());
+app.use(errors()); // celebrate errors
 
 app.use((req, res) => {
   res
     .status(constants.status404)
     .send({ message: 'Такой страницы не существует' });
 });
+
+app.use(errorHandling); // Централизованный обработчик
 
 app.listen(PORT, () => {
   console.log(`Сервер запущен на порту: ${PORT}`);

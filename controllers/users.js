@@ -1,48 +1,38 @@
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const User = require('../models/user');
-const { handleError } = require('../utils/utils');
 const { jwtSecretKey } = require('../utils/constants');
 const { NotFoundError } = require('../utils/Errors/NotFoundError');
 const { ConflictError } = require('../utils/Errors/ConflictError');
 
-module.exports.getUsers = (req, res) => {
+module.exports.getUsers = (req, res, next) => {
   User.find({})
     .then((users) => {
       res.send({ data: users });
     })
-    .catch((e) => {
-      const { statusCode, message } = handleError(e);
-      res.status(statusCode).send({ message });
-    });
+    .catch(next);
 };
 
-module.exports.getCurrentUser = (req, res) => {
+module.exports.getCurrentUser = (req, res, next) => {
   User.findById(req.user._id)
     .then((data) => {
       if (!data) throw new NotFoundError('Пользователь не найден');
 
       res.send({ data });
     })
-    .catch((e) => {
-      const { statusCode, message } = handleError(e);
-      res.status(statusCode).send({ message });
-    });
+    .catch(next);
 };
 
-module.exports.getUserById = (req, res) => {
+module.exports.getUserById = (req, res, next) => {
   User.findById(req.params.userId)
     .then((data) => {
       if (data) res.send({ data });
       else throw new NotFoundError('Такого пользователя не существует');
     })
-    .catch((e) => {
-      const { statusCode, message } = handleError(e);
-      res.status(statusCode).send({ message });
-    });
+    .catch(next);
 };
 
-module.exports.createUser = async (req, res) => {
+module.exports.createUser = async (req, res, next) => {
   const {
     name, about, avatar, email, password,
   } = req.body;
@@ -50,9 +40,8 @@ module.exports.createUser = async (req, res) => {
   const user = await User.findOne({ email }).exec();
   try {
     if (user) throw new ConflictError('Такой пользователь уже зарегистрирован');
-  } catch (e) {
-    const { statusCode, message } = handleError(e);
-    res.status(statusCode).send({ message });
+  } catch (err) {
+    next(err);
   }
 
   bcrypt.hash(password, 10)
@@ -69,13 +58,11 @@ module.exports.createUser = async (req, res) => {
           },
         });
       })
-      .catch((e) => {
-        const { statusCode, message } = handleError(e);
-        res.status(statusCode).send({ message });
-      }));
+      .catch(next))
+    .catch(next);
 };
 
-module.exports.updateUserInfo = (req, res) => {
+module.exports.updateUserInfo = (req, res, next) => {
   const { name, about } = req.body;
 
   User.findByIdAndUpdate(
@@ -86,25 +73,19 @@ module.exports.updateUserInfo = (req, res) => {
     .then((user) => {
       res.send({ user });
     })
-    .catch((e) => {
-      const { statusCode, message } = handleError(e);
-      res.status(statusCode).send({ message });
-    });
+    .catch(next);
 };
 
-module.exports.updateUserAvatar = (req, res) => {
+module.exports.updateUserAvatar = (req, res, next) => {
   const { avatar } = req.body;
   User.findByIdAndUpdate(req.user._id, { avatar }, { new: true, runValidators: true })
     .then((user) => {
       res.send({ data: user });
     })
-    .catch((e) => {
-      const { statusCode, message } = handleError(e);
-      res.status(statusCode).send({ message });
-    });
+    .catch(next);
 };
 
-module.exports.login = (req, res) => {
+module.exports.login = (req, res, next) => {
   const { email, password } = req.body;
 
   User.findUserByCredentials(email, password)
@@ -117,8 +98,5 @@ module.exports.login = (req, res) => {
         })
         .send({ token });
     })
-    .catch((e) => {
-      const { statusCode, message } = handleError(e);
-      res.status(statusCode).send({ message });
-    });
+    .catch(next);
 };
