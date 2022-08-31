@@ -10,7 +10,7 @@ module.exports.getUsers = (req, res, next) => {
     .then((users) => {
       res.send({ data: users });
     })
-    .catch(next);
+    .catch(next); // Анализ ошибок в middlewares/errorHandling. Старый обработчик удалён.
 };
 
 module.exports.getCurrentUser = (req, res, next) => {
@@ -57,8 +57,7 @@ module.exports.createUser = async (req, res, next) => {
             avatar: data.avatar,
           },
         });
-      })
-      .catch(next))
+      }))
     .catch(next);
 };
 

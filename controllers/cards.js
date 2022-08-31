@@ -63,8 +63,7 @@ module.exports.deleteCard = (req, res, next) => {
         .then((data) => {
           if (data) res.send({ data });
           else next(new NotFoundError('Такого пользователя не существует'));
-        })
-        .catch(next);
+        });
     })
     .catch(next);
 };

@@ -8,6 +8,7 @@ const constants = require('./utils/constants');
 const auth = require('./middlewares/auth');
 const { login, createUser } = require('./controllers/users');
 const { errorHandling } = require('./middlewares/errorHandling');
+const { NotFoundError } = require('./utils/Errors/NotFoundError');
 
 const app = express();
 const { PORT = 3000 } = process.env;
@@ -48,10 +49,8 @@ app.use('/users', auth, require('./routes/users'));
 
 app.use(errors()); // celebrate errors
 
-app.use((req, res) => {
-  res
-    .status(constants.status404)
-    .send({ message: 'Такой страницы не существует' });
+app.use((req, res, next) => {
+  next(new NotFoundError('Такой страницы не существует'));
 });
 
 app.use(errorHandling); // Централизованный обработчик
