@@ -4,13 +4,14 @@ const User = require('../models/user');
 const { jwtSecretKey } = require('../utils/constants');
 const { NotFoundError } = require('../utils/Errors/NotFoundError');
 const { ConflictError } = require('../utils/Errors/ConflictError');
+const { BadRequestError } = require('../utils/Errors/BadRequestError');
 
 module.exports.getUsers = (req, res, next) => {
   User.find({})
     .then((users) => {
       res.send({ data: users });
     })
-    .catch(next); // Анализ ошибок в middlewares/errorHandling. Старый обработчик удалён.
+    .catch(next);
 };
 
 module.exports.getCurrentUser = (req, res, next) => {
@@ -29,7 +30,10 @@ module.exports.getUserById = (req, res, next) => {
       if (data) res.send({ data });
       else next(new NotFoundError('Такого пользователя не существует'));
     })
-    .catch(next);
+    .catch((err) => {
+      if (err.name === 'CastError') next(new BadRequestError('Переданы некорректные данные'));
+      next(err);
+    });
 };
 
 module.exports.createUser = async (req, res, next) => {
@@ -41,6 +45,7 @@ module.exports.createUser = async (req, res, next) => {
   try {
     if (user) next(new ConflictError('Такой пользователь уже зарегистрирован'));
   } catch (err) {
+    if (err.name === 'ValidationError') next(new BadRequestError('Переданы некорректные данные'));
     next(err);
   }
 
@@ -72,7 +77,10 @@ module.exports.updateUserInfo = (req, res, next) => {
     .then((user) => {
       res.send({ user });
     })
-    .catch(next);
+    .catch((err) => {
+      if (err.name === 'ValidationError') next(new BadRequestError('Переданы некорректны данные'));
+      next(err);
+    });
 };
 
 module.exports.updateUserAvatar = (req, res, next) => {
@@ -81,7 +89,10 @@ module.exports.updateUserAvatar = (req, res, next) => {
     .then((user) => {
       res.send({ data: user });
     })
-    .catch(next);
+    .catch((err) => {
+      if (err.name === 'ValidationError') next(new BadRequestError('Переданы некорректны данные'));
+      next(err);
+    });
 };
 
 module.exports.login = (req, res, next) => {
@@ -97,5 +108,8 @@ module.exports.login = (req, res, next) => {
         })
         .send({ token });
     })
-    .catch(next);
+    .catch((err) => {
+      if (err.name === 'ValidationError') next(new BadRequestError('Некорректные данные пользователся'));
+      next(err);
+    });
 };

@@ -1,13 +1,17 @@
 const Card = require('../models/card');
 const { NotFoundError } = require('../utils/Errors/NotFoundError');
 const { ForbiddenError } = require('../utils/Errors/ForbiddenError');
+const { BadRequestError } = require('../utils/Errors/BadRequestError');
 
 module.exports.getCards = (req, res, next) => {
   Card.find({})
     .then((data) => {
       res.send({ data });
     })
-    .catch(next);
+    .catch((err) => {
+      if (err.name === 'ValidationError') next(new BadRequestError('Переданы некорректные данные'));
+      next(err);
+    });
 };
 
 module.exports.createCard = (req, res, next) => {
@@ -21,7 +25,10 @@ module.exports.createCard = (req, res, next) => {
     .then((data) => {
       res.send({ data });
     })
-    .catch(next);
+    .catch((err) => {
+      if (err.name === 'ValidationError') next(new BadRequestError('Переданы некорректные данные'));
+      next(err);
+    });
 };
 
 module.exports.likeCard = (req, res, next) => {
@@ -36,7 +43,10 @@ module.exports.likeCard = (req, res, next) => {
       if (data) res.send({ data });
       else next(new NotFoundError('Такого пользователя не существует'));
     })
-    .catch(next);
+    .catch((err) => {
+      if (err.name === 'CastError') next(new BadRequestError('Переданы некорректные данные'));
+      next(err);
+    });
 };
 
 module.exports.deleteLike = (req, res, next) => {
@@ -49,7 +59,10 @@ module.exports.deleteLike = (req, res, next) => {
       if (data) res.send({ data });
       else next(new NotFoundError('Такой карточки не существует'));
     })
-    .catch(next);
+    .catch((err) => {
+      if (err.name === 'CastError') next(new BadRequestError('Переданые некорректные данные'));
+      next(err);
+    });
 };
 
 module.exports.deleteCard = (req, res, next) => {
@@ -65,5 +78,8 @@ module.exports.deleteCard = (req, res, next) => {
           else next(new NotFoundError('Такого пользователя не существует'));
         });
     })
-    .catch(next);
+    .catch((err) => {
+      if (err.name === 'CastError') next(new BadRequestError('Переданы некорректные данные'));
+      next(err);
+    });
 };
