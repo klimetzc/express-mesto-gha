@@ -16,7 +16,7 @@ module.exports.getUsers = (req, res, next) => {
 module.exports.getCurrentUser = (req, res, next) => {
   User.findById(req.user._id)
     .then((data) => {
-      if (!data) throw new NotFoundError('Пользователь не найден');
+      if (!data) next(new NotFoundError('Пользователь не найден'));
 
       res.send({ data });
     })
@@ -27,7 +27,7 @@ module.exports.getUserById = (req, res, next) => {
   User.findById(req.params.userId)
     .then((data) => {
       if (data) res.send({ data });
-      else throw new NotFoundError('Такого пользователя не существует');
+      else next(new NotFoundError('Такого пользователя не существует'));
     })
     .catch(next);
 };
@@ -39,7 +39,7 @@ module.exports.createUser = async (req, res, next) => {
 
   const user = await User.findOne({ email }).exec();
   try {
-    if (user) throw new ConflictError('Такой пользователь уже зарегистрирован');
+    if (user) next(new ConflictError('Такой пользователь уже зарегистрирован'));
   } catch (err) {
     next(err);
   }

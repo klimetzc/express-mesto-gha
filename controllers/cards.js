@@ -34,7 +34,7 @@ module.exports.likeCard = (req, res, next) => {
   )
     .then((data) => {
       if (data) res.send({ data });
-      else throw new NotFoundError('Такого пользователя не существует');
+      else next(new NotFoundError('Такого пользователя не существует'));
     })
     .catch(next);
 };
@@ -47,7 +47,7 @@ module.exports.deleteLike = (req, res, next) => {
   )
     .then((data) => {
       if (data) res.send({ data });
-      else throw new NotFoundError('Такой карточки не существует');
+      else next(new NotFoundError('Такой карточки не существует'));
     })
     .catch(next);
 };
@@ -55,14 +55,14 @@ module.exports.deleteLike = (req, res, next) => {
 module.exports.deleteCard = (req, res, next) => {
   Card.findById(req.params.cardId)
     .then((card) => {
-      if (!card) return Promise.reject(new NotFoundError('Карточка не найдена'));
-      if (card.owner._id.toString() !== req.user._id) return Promise.reject(new ForbiddenError('Можно удалять только свои карточки'));
+      if (!card) next(new NotFoundError('Карточка не найдена'));
+      if (card.owner._id.toString() !== req.user._id) next(new ForbiddenError('Можно удалять только свои карточки'));
     })
     .then(() => {
       Card.findByIdAndDelete(req.params.cardId)
         .then((data) => {
           if (data) res.send({ data });
-          else throw new NotFoundError('Такого пользователя не существует');
+          else next(new NotFoundError('Такого пользователя не существует'));
         })
         .catch(next);
     })
