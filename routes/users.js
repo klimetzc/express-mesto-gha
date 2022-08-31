@@ -1,6 +1,7 @@
 const router = require('express').Router();
 const { celebrate, Joi } = require('celebrate');
 const validator = require('validator');
+const constants = require('../utils/constants');
 const {
   getUsers,
   getUserById,
@@ -29,7 +30,7 @@ router.patch('/me', celebrate({
 router.patch('/me/avatar', celebrate({
   body: Joi.object().keys({
     avatar: Joi.string().custom((value) => {
-      if (!validator.isURL(value)) throw new Error('Неверный адрес');
+      if (!value.match(constants.urlRegExp) || !validator.isURL(value)) throw new Error('Неверный адрес');
       return value;
     }),
   }),
