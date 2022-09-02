@@ -9,6 +9,7 @@ const auth = require('./middlewares/auth');
 const { login, createUser } = require('./controllers/users');
 const { errorHandling } = require('./middlewares/errorHandling');
 const { NotFoundError } = require('./utils/Errors/NotFoundError');
+const { errorLogger, requestLogger } = require('./middlewares/logger');
 
 const app = express();
 const { PORT = 3000 } = process.env;
@@ -23,6 +24,8 @@ mongoose.connect('mongodb://localhost:27017/mestodb', options, (err) => {
   if (err) console.log(err);
   else console.log('database connection');
 });
+
+app.use(requestLogger);
 
 app.post('/signin', celebrate({
   body: Joi.object().keys({
@@ -47,12 +50,11 @@ app.post('/signup', celebrate({
 app.use('/cards', auth, require('./routes/cards'));
 app.use('/users', auth, require('./routes/users'));
 
+app.use(errorLogger); // winston logger
 app.use(errors()); // celebrate errors
-
 app.use((req, res, next) => {
   next(new NotFoundError('Такой страницы не существует'));
-});
-
+}); // Несуществующий путь
 app.use(errorHandling); // Централизованный обработчик
 
 app.listen(PORT, () => {
